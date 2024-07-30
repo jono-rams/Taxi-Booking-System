@@ -1,0 +1,11 @@
+Open CMD
+
+commands:
+
+Initialize your branch DO THIS FIRST BEFORE MAKING ANY CHANGES:
+
+Init.bat your_first_name
+
+Commit:
+
+Commit.bat "A message describing the changes in "" "
