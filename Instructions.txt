@@ -1,11 +1,23 @@
-Open CMD
+Open CMD in repo folder (where .git is)
 
 commands:
 
-Initialize your branch DO THIS FIRST BEFORE MAKING ANY CHANGES:
+Initialize your branch DO THIS FIRST BEFORE MAKING ANY CHANGES, THIS ONLY NEEDS TO BE DONE ONCE:
 
-Init.bat your_first_name
+0 - Init.bat your_first_name
+
+Pull Changes from main, DO THIS BEFORE MAKING ANY CHANGES:
+
+1 - PullChanges.bat your_first_name
 
 Commit:
 
-Commit.bat "A message describing the changes in "" "
+2 - Commit.bat "A message describing the changes in "" "
+
+TLDR:
+
+First Time setup: Open cmd in folder, type Init.bat your_first_name and enter
+
+Working on project: open cmd in folder, type PullChanges.bat your_first_name before editing anything
+
+After doing work: open cmd in folder, type Commit.bat "A message in quotes describing your changes"
