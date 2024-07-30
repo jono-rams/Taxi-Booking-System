@@ -1,3 +1,3 @@
 git checkout -b %1
-git merge origin/master
+git merge main
 git push --set-upstream origin %1
