@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QMessageBox
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap, QFont
 
 
 # Function to display a message box with "Hello World!" content
@@ -16,12 +17,22 @@ window = QWidget()
 window.setWindowTitle("Taxi Booking System")
 window.setFixedSize(800, 600)
 
+# Create Background Image
+background_image = QLabel(window)
+background_image.setGeometry(0, 0, 800, 600)
+background_image.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+background_image.setPixmap(QPixmap("assets/images/bg.jpg"))
+
 # Create Vertical Layout
 v_layout = QVBoxLayout()
 
 # Create Label Widget
 label = QLabel("Welcome to the Taxi Booking System!")
-label.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+font = QFont()
+font.setPointSize(20)
+font.setFamily("TimesNewRoman")
+label.setFont(font)
 
 # Add Label to Vertical Layout
 v_layout.addWidget(label)
