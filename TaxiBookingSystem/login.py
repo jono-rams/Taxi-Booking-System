@@ -6,7 +6,6 @@ from PyQt6.QtGui import QFont
 class LoginWidget(QWidget):
 
     # Function to display a message box with "Hello World!" content
-    @staticmethod
     def handle_login(self):
         email = self.email_input.text()
         password = self.password_input.text()
