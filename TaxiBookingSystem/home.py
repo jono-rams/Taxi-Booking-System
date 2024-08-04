@@ -44,6 +44,7 @@ class HomeWidget(QWidget):
         # Create Login Button
         login_btn = QPushButton("Login")
         login_btn.setFixedSize(500, 125)
+        login_btn.setFont(QFont("TimesNewRoman", 16))
         login_btn.clicked.connect(self.open_login_dialog)
 
         # Add Login Button to Horizontal Layout
@@ -52,6 +53,7 @@ class HomeWidget(QWidget):
         # Create Register Button
         register_btn = QPushButton("Register")
         register_btn.setFixedSize(500, 125)
+        register_btn.setFont(QFont("TimesNewRoman", 16))
         register_btn.clicked.connect(self.display_msg)
 
         # Add Register Button to Horizontal Layout
@@ -60,6 +62,7 @@ class HomeWidget(QWidget):
         # Create Exit Button
         exit_btn = QPushButton("Exit")
         exit_btn.setFixedSize(500, 125)
+        exit_btn.setFont(QFont("TimesNewRoman", 16))
         exit_btn.clicked.connect(app.quit)
 
         # Add Exit Button to Horizontal Layout
