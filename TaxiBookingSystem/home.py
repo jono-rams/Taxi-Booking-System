@@ -1,13 +1,20 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QFont
+from login import LoginWidget
+
 
 class HomeWidget(QWidget):
 
     # Function to display a message box with "Hello World!" content
-    def display_msg(self):
+    @staticmethod
+    def display_msg():
         QMessageBox.information(None, "Message", "Hello World!")
 
+    # Function to open a login dialog
+    def open_login_dialog(self):
+        self.login_dialog = LoginWidget()
+        self.login_dialog.show()
 
     def __init__(self, app):
         super().__init__()
@@ -44,7 +51,7 @@ class HomeWidget(QWidget):
 
         # Create Login Button
         login_btn = QPushButton("Login")
-        login_btn.clicked.connect(self.display_msg)
+        login_btn.clicked.connect(self.open_login_dialog)
 
         # Add Login Button to Horizontal Layout
         h_layout.addWidget(login_btn)
