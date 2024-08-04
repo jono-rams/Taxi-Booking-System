@@ -19,38 +19,31 @@ class HomeWidget(QWidget):
     def __init__(self, app):
         super().__init__()
 
+        self.login_dialog = None
+
         # Create Main Window
         self.setWindowTitle("Taxi Booking System")
-        self.setFixedSize(800, 600)
+        self.setFixedSize(1600, 900)
 
         # Create Background Image
         background_image = QLabel(self)
-        background_image.setGeometry(0, 0, 800, 600)
-        background_image.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        background_image.setGeometry(0, 0, 1600, 900)
+        background_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         background_image.setPixmap(QPixmap("assets/images/bg.jpg"))
 
         # Create Vertical Layout
         v_layout = QVBoxLayout()
 
-        # Create Label Widget
-        label = QLabel("Welcome to the Taxi Booking System!")
-        label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
-        font = QFont()
-        font.setPointSize(20)
-        font.setFamily("TimesNewRoman")
-        label.setFont(font)
-
-        # Add Label to Vertical Layout
-        v_layout.addWidget(label)
-
         # Create Horizontal Layout for Buttons
         h_layout = QHBoxLayout()
+        h_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom)
 
         # Add Horizontal Layout to Vertical Layout
         v_layout.addLayout(h_layout)
 
         # Create Login Button
         login_btn = QPushButton("Login")
+        login_btn.setFixedSize(500, 125)
         login_btn.clicked.connect(self.open_login_dialog)
 
         # Add Login Button to Horizontal Layout
@@ -58,6 +51,7 @@ class HomeWidget(QWidget):
 
         # Create Register Button
         register_btn = QPushButton("Register")
+        register_btn.setFixedSize(500, 125)
         register_btn.clicked.connect(self.display_msg)
 
         # Add Register Button to Horizontal Layout
@@ -65,6 +59,7 @@ class HomeWidget(QWidget):
 
         # Create Exit Button
         exit_btn = QPushButton("Exit")
+        exit_btn.setFixedSize(500, 125)
         exit_btn.clicked.connect(app.quit)
 
         # Add Exit Button to Horizontal Layout

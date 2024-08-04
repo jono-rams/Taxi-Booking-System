@@ -1,14 +1,16 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QMessageBox, QHBoxLayout, QVBoxLayout
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+from connection import Database
 
 
 class LoginWidget(QWidget):
 
     # Function to display a message box with "Hello World!" content
     def handle_login(self):
-        email = self.email_input.text()
-        password = self.password_input.text()
+        self.db.connect("db/test.db")
+        email: str = self.email_input.text()
+        password: str = self.password_input.text()
 
         if not email:
             QMessageBox.warning(None, "Error", "Please enter an email address.")
@@ -18,11 +20,23 @@ class LoginWidget(QWidget):
             QMessageBox.warning(None, "Error", "Please enter a password.")
             return
 
-        # TODO: Check email and password combination against database
-        QMessageBox.information(None, "Login Successful", "Welcome")
+        # Check email and password combination against database
+        login_query = "SELECT * FROM users WHERE email = ? AND password = ?"
+        login_params = (email, password)
+
+        results = self.db.execute_query(query=login_query, params=login_params)
+
+        if not results:
+            QMessageBox.warning(None, "Error", "Invalid email or password.")
+        else:
+            QMessageBox.information(None, "Login Successful", "Welcome")
+
+        self.db.close_connection()
 
     def __init__(self):
         super().__init__()
+
+        self.db = Database()
 
         # Create Main Window
         self.setWindowTitle("Login")

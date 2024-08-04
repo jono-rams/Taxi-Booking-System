@@ -1,14 +1,15 @@
 import sys
 from PyQt6.QtWidgets import QApplication
 from home import HomeWidget
-class App():
+
+
+class App:
     def __init__(self):
         self.app = QApplication(sys.argv)
-        self.login_window = HomeWidget(app = self.app)
-
+        self.home_window = HomeWidget(app=self.app)
 
     def run_app(self):
-        self.login_window.show()
+        self.home_window.show()
         sys.exit(self.app.exec())
 
 
