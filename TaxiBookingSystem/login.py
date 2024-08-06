@@ -6,7 +6,6 @@ from connection import Database
 
 class LoginWidget(QWidget):
 
-    # Function to display a message box with "Hello World!" content
     def handle_login(self):
         self.db.connect("db/test.db")
         email: str = self.email_input.text()
@@ -26,12 +25,13 @@ class LoginWidget(QWidget):
 
         results = self.db.execute_query(query=login_query, params=login_params)
 
+        self.db.close_connection()
+
         if not results:
             QMessageBox.warning(None, "Error", "Invalid email or password.")
         else:
             QMessageBox.information(None, "Login Successful", "Welcome")
-
-        self.db.close_connection()
+            self.close()
 
     def __init__(self):
         super().__init__()
@@ -52,7 +52,7 @@ class LoginWidget(QWidget):
         font.setPointSize(20)
         font.setFamily("TimesNewRoman")
         label.setFont(font)
-        label.setFixedHeight(30)
+        label.setFixedHeight(35)
 
         # Add Label to Vertical Layout
         v_layout.addWidget(label)
