@@ -35,3 +35,19 @@ class Database:
 
         finally:
             cursor.close()
+
+    def insert_data(self, command, data):
+        cursor = self.conn.cursor()
+        try:
+            query = command
+            cursor.execute(query, data)
+            self.conn.commit()
+
+            return cursor.lastrowid
+
+        except sqlite3.Error as e:
+            print(f"Error executing query: {e}")
+            return None
+
+        finally:
+            cursor.close()
