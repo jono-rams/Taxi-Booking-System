@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QHBoxLay
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QFont
 from login import LoginWidget
+from register import RegisterWidget
 
 
 class HomeWidget(QWidget):
@@ -16,10 +17,15 @@ class HomeWidget(QWidget):
         self.login_dialog = LoginWidget()
         self.login_dialog.show()
 
+    def open_register_dialog(self):
+        self.register_dialog = RegisterWidget(home_widget=self)
+        self.register_dialog.show()
+
     def __init__(self, app):
         super().__init__()
 
         self.login_dialog = None
+        self.register_dialog = None
 
         # Create Main Window
         self.setWindowTitle("Taxi Booking System")
@@ -54,7 +60,7 @@ class HomeWidget(QWidget):
         register_btn = QPushButton("Register")
         register_btn.setFixedSize(500, 125)
         register_btn.setFont(QFont("TimesNewRoman", 16))
-        register_btn.clicked.connect(self.display_msg)
+        register_btn.clicked.connect(self.open_register_dialog)
 
         # Add Register Button to Horizontal Layout
         h_layout.addWidget(register_btn)
