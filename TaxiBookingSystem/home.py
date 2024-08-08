@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QMessageBox
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap, QFont
+from PyQt6.QtGui import QPixmap, QFont, QPalette, QBrush
 from login import LoginWidget
 from register import RegisterWidget
 
@@ -21,6 +21,12 @@ class HomeWidget(QWidget):
         self.register_dialog = RegisterWidget(home_widget=self)
         self.register_dialog.show()
 
+    def scale_background_image(self):
+        scaled_bg = self.background_image.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio)
+        palette = self.palette()
+        palette.setBrush(QPalette.ColorGroup.All, QPalette.ColorRole.Window, QBrush(scaled_bg))
+        self.setPalette(palette)
+
     def __init__(self, app):
         super().__init__()
 
@@ -29,13 +35,15 @@ class HomeWidget(QWidget):
 
         # Create Main Window
         self.setWindowTitle("Taxi Booking System")
-        self.setFixedSize(1600, 900)
 
         # Create Background Image
-        background_image = QLabel(self)
-        background_image.setGeometry(0, 0, 1600, 900)
-        background_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        background_image.setPixmap(QPixmap("assets/images/bg.jpg"))
+        self.background_image = QPixmap("assets/images/bg.jpg")
+        self.scale_background_image()
+        self.original_aspect_ratio = self.background_image.width() / self.background_image.height()
+
+        # Allow resizing but maintain aspect ratio
+        self.setFixedSize(self.background_image.size())
+        self.setMinimumSize(self.background_image.size() / 2)  # Set minimum size
 
         # Create Vertical Layout
         v_layout = QVBoxLayout()
@@ -49,7 +57,8 @@ class HomeWidget(QWidget):
 
         # Create Login Button
         login_btn = QPushButton("Login")
-        login_btn.setFixedSize(500, 125)
+        login_btn.setMinimumSize(250, 62)
+        login_btn.setMaximumSize(500, 125)
         login_btn.setFont(QFont("TimesNewRoman", 16))
         login_btn.clicked.connect(self.open_login_dialog)
 
@@ -58,7 +67,8 @@ class HomeWidget(QWidget):
 
         # Create Register Button
         register_btn = QPushButton("Register")
-        register_btn.setFixedSize(500, 125)
+        register_btn.setMinimumSize(250, 62)
+        register_btn.setMaximumSize(500, 125)
         register_btn.setFont(QFont("TimesNewRoman", 16))
         register_btn.clicked.connect(self.open_register_dialog)
 
@@ -67,7 +77,8 @@ class HomeWidget(QWidget):
 
         # Create Exit Button
         exit_btn = QPushButton("Exit")
-        exit_btn.setFixedSize(500, 125)
+        exit_btn.setMinimumSize(250, 62)
+        exit_btn.setMaximumSize(500, 125)
         exit_btn.setFont(QFont("TimesNewRoman", 16))
         exit_btn.clicked.connect(app.quit)
 
@@ -76,3 +87,9 @@ class HomeWidget(QWidget):
 
         # Add Vertical Layout to Main Window
         self.setLayout(v_layout)
+
+    def resizeEvent(self, event):
+        self.scale_background_image()
+        new_width = event.size().width()
+        new_height = int(new_width / self.original_aspect_ratio)
+        self.resize(new_width, new_height)
