@@ -40,8 +40,7 @@ class Database:
         cursor = self.conn.cursor()
         try:
             cursor.execute(query, data)
-            self.conn.commit()
-
+            self.conn.commit()  # Commit the changes to database
             return True
 
         except sqlite3.Error as e:
