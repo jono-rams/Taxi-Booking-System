@@ -35,6 +35,7 @@ class HomeWidget(QWidget):
 
         return QSize(new_width, new_height)
 
+    # Function that scales the background image while maintaining its aspect ratio
     def scale_background_image(self):
         scaled_bg = self.background_image.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio)
         palette = self.palette()
@@ -75,6 +76,7 @@ class HomeWidget(QWidget):
         self.login_btn.setMaximumSize(500, 125)
         self.login_btn.setFont(QFont("TimesNewRoman", 16))
         self.login_btn.clicked.connect(self.open_login_dialog)
+        # Allow button to resize
         self.login_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Add Login Button to Horizontal Layout
@@ -86,6 +88,7 @@ class HomeWidget(QWidget):
         self.register_btn.setMaximumSize(500, 125)
         self.register_btn.setFont(QFont("TimesNewRoman", 16))
         self.register_btn.clicked.connect(self.open_register_dialog)
+        # Allow button to resize
         self.register_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Add Register Button to Horizontal Layout
@@ -97,6 +100,7 @@ class HomeWidget(QWidget):
         self.exit_btn.setMaximumSize(500, 125)
         self.exit_btn.setFont(QFont("TimesNewRoman", 16))
         self.exit_btn.clicked.connect(app.quit)
+        # Allow Button to resize
         self.exit_btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Add Exit Button to Horizontal Layout
@@ -127,7 +131,8 @@ class HomeWidget(QWidget):
         desired_width = int(window_width * width_factor)
         desired_height = int(window_height * height_factor)
 
-        aspect_ratio = self.login_btn.width() / self.login_btn.height()  # Original aspect ratio
+        # Calculate the desired size based on the original aspect ratio of the login button
+        aspect_ratio = self.login_btn.width() / self.login_btn.height()
         if desired_width / desired_height > aspect_ratio:
             desired_width = int(desired_height * aspect_ratio)
         else:
