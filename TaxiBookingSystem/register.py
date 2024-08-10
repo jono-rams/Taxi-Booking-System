@@ -12,6 +12,7 @@ class RegisterWidget(QWidget):
         email: str = self.email_input.text()
         password: str = self.password_input.text()
 
+        # Validate email and password being entered
         if not email:
             QMessageBox.warning(None, "Error", "Please enter an email address.")
             return
@@ -20,14 +21,15 @@ class RegisterWidget(QWidget):
             QMessageBox.warning(None, "Error", "Please enter a password.")
             return
 
-        # Check email and password combination against database
+        # Create Insert statement
         register_query = "INSERT INTO users (email, password) VALUES (?, ?)"
         reg_data = (email, password)
 
-        results = self.db.insert_data(query=register_query, data=reg_data)
+        results = self.db.insert_data(query=register_query, data=reg_data)  # Runs insert statement
 
-        self.db.close_connection()
+        self.db.close_connection()  # Close database connection
 
+        # Error handling
         if not results:
             QMessageBox.warning(None, "Error", "Unable to register")
         else:
