@@ -1,4 +1,5 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QMessageBox, QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, QLineEdit, QMessageBox, QHBoxLayout,
+                             QVBoxLayout, QComboBox)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from connection import Database
@@ -88,6 +89,26 @@ class LoginWidget(QWidget):
         fields_layout.addLayout(email_layout)
         fields_layout.addLayout(password_layout)
 
+        # Create Horizontal Layout for Options
+        options_layout = QHBoxLayout()
+        options_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        # Create Label for Login Options
+        options_label = QLabel("Login option:")
+
+        # Create Combo Box to select login options
+        self.options_box = QComboBox()
+        self.options_box.addItems(["Customer", "Driver", "Admin"])
+        self.options_box.currentIndexChanged.connect(self.on_selection_changed)
+        self.selected_option = None
+
+        # Add Options widgets to Layout
+        options_layout.addWidget(options_label)
+        options_layout.addWidget(self.options_box, 1)
+
+        # Add Options Layout to Vertical Layout
+        fields_layout.addLayout(options_layout)
+
         # Add Fields Layout to Vertical Layout
         v_layout.addLayout(fields_layout)
 
@@ -113,3 +134,6 @@ class LoginWidget(QWidget):
 
         # Set Vertical Layout to Main Window
         self.setLayout(v_layout)
+
+    def on_selection_changed(self, index):
+        self.selected_option = self.options_box.currentText()
