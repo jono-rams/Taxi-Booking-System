@@ -44,7 +44,7 @@ class RegisterWidget(QWidget):
         self.home = home_widget
 
         # Create Main Window
-        self.setWindowTitle("Login")
+        self.setWindowTitle("Register")
         self.setFixedSize(600, 450)
 
         # Create Vertical Layout
