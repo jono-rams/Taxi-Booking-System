@@ -60,7 +60,7 @@ class BookingWidget(QWidget):
         self.edit_btn.setText("Edit")
         self.edit_btn.clicked.connect(self.edit_booking)
 
-    def __init__(self, booking, editable=False, is_admin=False):
+    def __init__(self, booking, is_customer=False, is_admin=False):
         super().__init__()
         (self.id, self.pickup_addr, self.destination, self.pickup_date, self.pickup_time, self.status, self.customer_id,
          self.driver_id, self.payment_status) = booking
@@ -226,12 +226,19 @@ class BookingWidget(QWidget):
         v_layout.addLayout(buttons_layout)
 
         # Edit Button
-        if editable:
+        if is_customer or is_admin:
             self.edit_btn = QPushButton("Edit")
             self.edit_btn.clicked.connect(self.edit_booking)
             buttons_layout.addWidget(self.edit_btn)
         else:
             self.edit_btn = None
+
+        if is_customer:
+            self.cancel_btn = QPushButton("Cancel")
+            # self.cancel_btn.clicked.connect(self.cancel_booking)
+            buttons_layout.addWidget(self.cancel_btn)
+        else:
+            self.cancel_btn = None
 
         # Close Button
         close_btn = QPushButton("Close")
