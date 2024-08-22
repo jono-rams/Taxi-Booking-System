@@ -97,11 +97,10 @@ class BookingWidget(QWidget):
         pickup_time_layout = QHBoxLayout()
         status_layout = QHBoxLayout()
         customer_name_layout = QHBoxLayout()
+        driver_name_layout = QHBoxLayout()
         if is_admin:
-            driver_name_layout = QHBoxLayout()
             payment_status_layout = QHBoxLayout()
         else:
-            driver_name_layout = None
             payment_status_layout = None
 
         details_layout.addLayout(id_layout)
@@ -111,8 +110,8 @@ class BookingWidget(QWidget):
         details_layout.addLayout(pickup_time_layout)
         details_layout.addLayout(status_layout)
         details_layout.addLayout(customer_name_layout)
+        details_layout.addLayout(driver_name_layout)
         if is_admin:
-            details_layout.addLayout(driver_name_layout)
             details_layout.addLayout(payment_status_layout)
 
         # Create Label Widgets
@@ -151,12 +150,12 @@ class BookingWidget(QWidget):
         customer_name_label.setStyleSheet("font-weight: bold;")
         customer_name_layout.addWidget(customer_name_label)
 
-        if is_admin:
-            driver_name_label = QLabel("Driver Name:")
-            driver_name_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-            driver_name_label.setStyleSheet("font-weight: bold;")
-            driver_name_layout.addWidget(driver_name_label)
+        driver_name_label = QLabel("Driver Name:")
+        driver_name_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        driver_name_label.setStyleSheet("font-weight: bold;")
+        driver_name_layout.addWidget(driver_name_label)
 
+        if is_admin:
             payment_status_label = QLabel("Payment Status:")
             payment_status_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
             driver_name_label.setStyleSheet("font-weight: bold;")
@@ -211,7 +210,15 @@ class BookingWidget(QWidget):
             self.payment_status_edit.setReadOnly(True)
             payment_status_layout.addWidget(self.payment_status_edit)
         else:
-            self.driver_name_edit = None
+            if self.driver_id == -1:
+                name = "Unassigned"
+            else:
+                # name = self.get_driver_name(self.driver_id)
+                name = "Unknown"  # Placeholder until driver data is available
+
+            self.driver_name_edit = QLineEdit(name)
+            self.driver_name_edit.setReadOnly(True)
+            driver_name_layout.addWidget(self.driver_name_edit)
             self.payment_status_edit = None
 
         # Buttons Layout
