@@ -3,10 +3,59 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, QLineEd
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from connection import Database
-import sys
+from approvebooking import ApproveBookingWidget
 
 
 class BookingWidget(QWidget):
+    def cancel_booking(self):
+        cancel_query = "UPDATE booking SET status = 'Cancelled' WHERE bookingID = ?"
+        cancel_params = (self.booking_id,)
+
+        db = Database()
+        db.connect("db/test.db")
+        db.execute_query(query=cancel_query, params=cancel_params)
+        db.close_connection()
+
+    def decline_booking(self):
+        decline_query = "UPDATE booking SET status = 'Declined' WHERE bookingID = ?"
+        decline_params = (self.booking_id,)
+
+        db = Database()
+        db.connect("db/test.db")
+        db.execute_query(query=decline_query, params=decline_params)
+        db.close_connection()
+
+    def approve_booking(self):
+        approve_widget = ApproveBookingWidget(self.booking_id)
+        approve_widget.show()
+        self.close()
+
+    def update_booking(self):
+        db = Database()
+        db.connect("db/test.db")
+
+        self.pickup_addr = self.pickup_addr_edit.text()
+        self.destination = self.destination_edit.text()
+        self.pickup_date = self.pickup_date_edit.text()
+        self.pickup_time = self.pickup_time_edit.text()
+        self.status = self.status_edit.text()
+        self.payment_status = self.payment_status_edit.text()
+        idx = self.driver_combobox.currentIndex()
+        driver_id = self.drivers[idx][1]
+
+        if self.is_customer:
+            update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
+                       "pickupDate =?, pickupTime =?, WHERE bookingID =?"
+            update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time)
+            db.execute_query(query=update_query, params=update_params)
+        elif self.is_admin:
+            update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
+                       "pickupDate =?, pickupTime =?, DriverID =?, status =?, paymentStatus =? WHERE bookingID =?"
+            update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time,
+                             driver_id, self.status, self.payment_status, self.booking_id)
+            db.execute_query(query=update_query, params=update_params)
+
+        db.close_connection()
 
     @staticmethod
     def one_or_none_true(a, b, c):
@@ -30,7 +79,7 @@ class BookingWidget(QWidget):
     def get_all_drivers():
         db = Database()
         db.connect("db/test.db")
-        drivers_query = "SELECT name FROM driver"
+        drivers_query = "SELECT name, driverID FROM driver WHERE status = 'Active'"
         drivers = db.execute_query(query=drivers_query)
         db.close_connection()
         return drivers or []
@@ -57,7 +106,7 @@ class BookingWidget(QWidget):
         self.edit_btn.setText("View")
         self.edit_btn.clicked.connect(self.view_booking)
         self.third_btn.setText("Update")
-        # self.third_btn.clicked.connect(self.update_booking)
+        self.third_btn.clicked.connect(self.update_booking)
         self.third_btn.show()
         self.third_btn.setEnabled(False)
 
@@ -88,14 +137,14 @@ class BookingWidget(QWidget):
         self.edit_btn.setText("Edit")
         self.edit_btn.clicked.connect(self.edit_booking)
         self.third_btn.setText("Cancel")
-        # self.third_btn.clicked.connect(self.cancel_booking)
+        self.third_btn.clicked.connect(self.cancel_booking)
         self.third_btn.setEnabled(True)
         if self.is_admin:
             self.third_btn.hide()
 
     def __init__(self, booking, is_customer=False, is_admin=False, is_to_approve=False):
         super().__init__()
-        (self.id, self.pickup_addr, self.destination, self.pickup_date, self.pickup_time, self.status, self.customer_id,
+        (self.booking_id, self.pickup_addr, self.destination, self.pickup_date, self.pickup_time, self.status, self.customer_id,
          self.driver_id, self.payment_status) = booking
 
         self.is_admin = is_admin
@@ -200,7 +249,7 @@ class BookingWidget(QWidget):
             payment_status_layout.addWidget(payment_status_label)
 
         # Create Line Edits (Uneditable)
-        self.id_edit = QLineEdit(str(self.id))
+        self.id_edit = QLineEdit(str(self.booking_id))
         self.id_edit.setReadOnly(True)
         id_layout.addWidget(self.id_edit)
 
@@ -230,18 +279,17 @@ class BookingWidget(QWidget):
         self.status_edit.textEdited.connect(self.on_edited)
 
         name = self.get_customer_name(self.customer_id)
-        # name = "Unknown"  # Placeholder until customer data is available
         self.customer_name_edit = QLineEdit(str(name[0]))
         self.customer_name_edit.setReadOnly(True)
         customer_name_layout.addWidget(self.customer_name_edit)
 
         if is_admin:
             self.name = self.get_driver_name(self.driver_id)
+            self.drivers = get_all_drivers()
             self.driver_name_edit = QComboBox()
-            self.driver_name_edit.addItems(self.get_all_drivers())  # Populate combo box with all drivers
-            # self.driver_name_edit.addItems(["Unknown", "Mystery"])  # Placeholder
+            driver_names = (driver[0] for driver in self.drivers)
+            self.driver_combobox.addItems(driver_names)
             index = driver_name_edit.findText(self.name)
-            # index = self.driver_name_edit.findText("Mystery")  # Placeholder
 
             if index != -1:
                 self.driver_name_edit.setCurrentIndex(index)
@@ -250,7 +298,7 @@ class BookingWidget(QWidget):
             driver_name_layout.addWidget(self.driver_name_edit, 1)
             self.driver_name_edit.currentTextChanged.connect(self.on_edited)
 
-            self.payment_status_edit = QLineEdit(self.payment_status)  # Placeholder until payment data is available
+            self.payment_status_edit = QLineEdit(self.payment_status)
             self.payment_status_edit.setReadOnly(True)
             payment_status_layout.addWidget(self.payment_status_edit)
             self.payment_status_edit.textEdited.connect(self.on_edited)
@@ -261,7 +309,6 @@ class BookingWidget(QWidget):
                 name = "Unassigned"
             else:
                 name = self.get_driver_name(self.driver_id)
-                # name = "Unknown"  # Placeholder until driver data is available
 
             self.driver_name_edit = QLineEdit(str(name[0]))
             self.driver_name_edit.setReadOnly(True)
@@ -279,23 +326,23 @@ class BookingWidget(QWidget):
             buttons_layout.addWidget(self.edit_btn)
         elif is_to_approve:
             self.edit_btn = QPushButton("Approve")
-            # self.edit_btn.clicked.connect(self.approve_booking)
+            self.edit_btn.clicked.connect(self.approve_booking)
             buttons_layout.addWidget(self.edit_btn)
         else:
             self.edit_btn = None
 
         if is_customer:
             self.third_btn = QPushButton("Cancel")
-            # self.third_btn.clicked.connect(self.cancel_booking)
+            self.third_btn.clicked.connect(self.cancel_booking)
             buttons_layout.addWidget(self.third_btn)
         elif is_admin and not is_to_approve:
             self.third_btn = QPushButton("Update")
-            # self.third_btn.clicked.connect(self.update_booking)
+            self.third_btn.clicked.connect(self.update_booking)
             buttons_layout.addWidget(self.third_btn)
             self.third_btn.hide()
         elif is_to_approve:
             self.third_btn = QPushButton("Decline")
-            # self.third_btn.clicked.connect(self.decline_booking)
+            self.third_btn.clicked.connect(self.decline_booking)
             buttons_layout.addWidget(self.third_btn)
 
         close_layout = QHBoxLayout()

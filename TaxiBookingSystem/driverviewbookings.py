@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 import datetime
 from connection import Database
-from booking import BookingWidget
+from bookingdetails import BookingWidget
 
 
 class ViewBookings(QWidget):
@@ -35,7 +35,7 @@ class ViewBookings(QWidget):
 
         self.db = Database()
         self.db.connect("db/test.db")
-        booking_query = "SELECT * FROM booking WHERE DriverID = ? AND PickupDate >= ?"
+        booking_query = "SELECT * FROM booking WHERE DriverID = ? AND PickupDate >= ? AND status = 'Pending'"
         today = datetime.date.today()
         booking_params = (self.driver_id, today)
         self.bookings = self.db.execute_query(query=booking_query, params=booking_params, fetch_all=True)
