@@ -49,7 +49,7 @@ class ViewBookings(QWidget):
 
             view_btn = QPushButton("View")
             view_btn.setFixedSize(120, 50)
-            view_btn.clicked.connect(lambda index=i: self.handle_view_click(index=index))
+            view_btn.clicked.connect(lambda _, idx=i: self.handle_view_click(idx))
             entry_layout.addWidget(view_btn)
 
             scroll_layout.addLayout(entry_layout)
