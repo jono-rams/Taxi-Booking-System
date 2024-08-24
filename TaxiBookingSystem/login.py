@@ -27,6 +27,7 @@ class LoginWidget(QWidget):
 
         if self.selected_option == 0:
             login_query = "SELECT customerID FROM customer WHERE email =? AND password =?"
+            result = self.db.execute_query(query=login_query, params=login_params)
         elif self.selected_option == 1:
             login_query = "SELECT driverID FROM driver WHERE email =? AND password =? AND status = 'Active'"
             result = self.db.execute_query(query=login_query, params=login_params)
@@ -39,6 +40,7 @@ class LoginWidget(QWidget):
                 QMessageBox.warning(None, "Error", "Invalid email or password.")
         else:
             login_query = "SELECT AdminID FROM administrator WHERE email =? AND password = ?"
+            result = self.db.execute_query(query=login_query, params=login_params)
 
         self.db.close_connection()
 

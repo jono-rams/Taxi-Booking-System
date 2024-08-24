@@ -35,7 +35,7 @@ class ViewBookings(QWidget):
 
         self.db = Database()
         self.db.connect("db/test.db")
-        booking_query = "SELECT * FROM booking WHERE DriverID = ? AND PickupDate >= ? AND status = 'Pending'"
+        booking_query = "SELECT * FROM booking WHERE DriverID = ? AND PickupDate >= ? AND BookingStatus = 'Confirmed'"
         today = datetime.date.today()
         booking_params = (self.driver_id, today)
         self.bookings = self.db.execute_query(query=booking_query, params=booking_params, fetch_all=True)
@@ -60,7 +60,7 @@ class ViewBookings(QWidget):
         # Add close button
         self.close_btn = QPushButton("Close")
         self.close_btn.setFixedSize(100, 50)
-        self.close_btn.clicked.connect(self.close)
+        self.close_btn.clicked.connect(self.handle_close)
         button_layout.addWidget(self.close_btn)
 
         self.layout.addLayout(button_layout)
