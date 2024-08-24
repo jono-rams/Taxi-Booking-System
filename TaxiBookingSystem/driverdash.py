@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QHBoxLay
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QFont
 from connection import Database
-from viewbookings import ViewBookings
+from driverviewbookings import ViewBookings
 
 
 class DriverDashboard(QWidget):
