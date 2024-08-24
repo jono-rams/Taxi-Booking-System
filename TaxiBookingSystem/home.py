@@ -14,7 +14,7 @@ class HomeWidget(QWidget):
 
     # Function to open a login dialog
     def open_login_dialog(self):
-        self.login_dialog = LoginWidget()
+        self.login_dialog = LoginWidget(menu_ref=self)
         self.login_dialog.show()
 
     def open_register_dialog(self):
