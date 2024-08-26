@@ -1,2 +1,3 @@
 .idea
-#TaxiBookingSystem/db
+TaxiBookingSystem/db
+*.db

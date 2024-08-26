@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, QLineEd
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from connection import Database
+from driverdash import DriverDashboard
 
 
 class LoginWidget(QWidget):
@@ -21,23 +22,35 @@ class LoginWidget(QWidget):
             return
 
         # Check email and password combination against database
-        login_query = "SELECT * FROM users WHERE email = ? AND password = ?"
+        login_query = None
         login_params = (email, password)
 
-        results = self.db.execute_query(query=login_query, params=login_params)
+        if self.selected_option == 0:
+            login_query = "SELECT customerID FROM customer WHERE email =? AND password =?"
+            result = self.db.execute_query(query=login_query, params=login_params)
+        elif self.selected_option == 1:
+            login_query = "SELECT driverID FROM driver WHERE email =? AND password =? AND status = 'Active'"
+            result = self.db.execute_query(query=login_query, params=login_params)
+            if result:
+                self.dash = DriverDashboard(driver_id=result)
+                self.dash.show()
+                self.menu_ref.close()
+                self.close()
+            else:
+                QMessageBox.warning(None, "Error", "Invalid email or password.")
+        else:
+            login_query = "SELECT AdminID FROM administrator WHERE email =? AND password = ?"
+            result = self.db.execute_query(query=login_query, params=login_params)
 
         self.db.close_connection()
 
-        if not results:
-            QMessageBox.warning(None, "Error", "Invalid email or password.")
-        else:
-            QMessageBox.information(None, "Login Successful", "Welcome")
-            self.close()
-
-    def __init__(self):
+    def __init__(self, menu_ref):
         super().__init__()
 
         self.db = Database()
+
+        self.dash = None
+        self.menu_ref = menu_ref
 
         # Create Main Window
         self.setWindowTitle("Login")
@@ -100,7 +113,7 @@ class LoginWidget(QWidget):
         self.options_box = QComboBox()
         self.options_box.addItems(["Customer", "Driver", "Admin"])
         self.options_box.currentIndexChanged.connect(self.on_selection_changed)
-        self.selected_option = None
+        self.selected_option = 0
 
         # Add Options widgets to Layout
         options_layout.addWidget(options_label)
@@ -136,4 +149,4 @@ class LoginWidget(QWidget):
         self.setLayout(v_layout)
 
     def on_selection_changed(self, index):
-        self.selected_option = self.options_box.currentText()
+        self.selected_option = index
