@@ -41,7 +41,7 @@ class BookingWidget(QWidget):
         if self.is_admin:
             self.status = self.status_edit.text()
             self.payment_status = self.payment_status_edit.text()
-            idx = self.driver_combobox.currentIndex()
+            idx = self.driver_name_edit.currentIndex()
             driver_id = self.drivers[idx][1]
 
         if self.is_customer:
