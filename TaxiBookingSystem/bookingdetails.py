@@ -128,7 +128,7 @@ class BookingWidget(QWidget):
             self.status_edit.setText(self.status)
 
             self.driver_name_edit.setEnabled(False)
-            index = driver_name_edit.findText(self.name)
+            index = self.driver_name_edit.findText(self.name)
             if index != -1:
                 self.driver_name_edit.setCurrentIndex(index)
 
@@ -286,11 +286,11 @@ class BookingWidget(QWidget):
 
         if is_admin:
             self.name = self.get_driver_name(self.driver_id)
-            self.drivers = get_all_drivers()
+            self.drivers = self.get_all_drivers()
             self.driver_name_edit = QComboBox()
             driver_names = (driver[0] for driver in self.drivers)
             self.driver_combobox.addItems(driver_names)
-            index = driver_name_edit.findText(self.name)
+            index = self.driver_name_edit.findText(self.name)
 
             if index != -1:
                 self.driver_name_edit.setCurrentIndex(index)
