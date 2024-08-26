@@ -8,7 +8,7 @@ from approvebooking import ApproveBookingWidget
 
 class BookingWidget(QWidget):
     def cancel_booking(self):
-        cancel_query = "UPDATE booking SET status = 'Cancelled' WHERE bookingID = ?"
+        cancel_query = "UPDATE booking SET BookingStatus = 'Cancelled' WHERE bookingID = ?"
         cancel_params = (self.booking_id,)
 
         db = Database()
