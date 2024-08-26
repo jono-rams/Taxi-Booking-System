@@ -38,10 +38,11 @@ class BookingWidget(QWidget):
         self.destination = self.destination_edit.text()
         self.pickup_date = self.pickup_date_edit.text()
         self.pickup_time = self.pickup_time_edit.text()
-        self.status = self.status_edit.text()
-        self.payment_status = self.payment_status_edit.text()
-        idx = self.driver_combobox.currentIndex()
-        driver_id = self.drivers[idx][1]
+        if self.is_admin:
+            self.status = self.status_edit.text()
+            self.payment_status = self.payment_status_edit.text()
+            idx = self.driver_combobox.currentIndex()
+            driver_id = self.drivers[idx][1]
 
         if self.is_customer:
             update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
