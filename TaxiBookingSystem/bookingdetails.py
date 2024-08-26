@@ -17,7 +17,7 @@ class BookingWidget(QWidget):
         db.close_connection()
 
     def decline_booking(self):
-        decline_query = "UPDATE booking SET status = 'Declined' WHERE bookingID = ?"
+        decline_query = "UPDATE booking SET BookingStatus = 'Declined' WHERE bookingID = ?"
         decline_params = (self.booking_id,)
 
         db = Database()
@@ -46,12 +46,12 @@ class BookingWidget(QWidget):
 
         if self.is_customer:
             update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
-                       "pickupDate =?, pickupTime =?, WHERE bookingID =?"
-            update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time)
+                       "pickupDate =?, pickupTime =? WHERE bookingID =?"
+            update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time, self.booking_id)
             db.insert_data(query=update_query, data=update_params)
         elif self.is_admin:
             update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
-                       "pickupDate =?, pickupTime =?, DriverID =?, status =?, paymentStatus =? WHERE bookingID =?"
+                       "pickupDate =?, pickupTime =?, DriverID =?, BookingStatus =?, paymentStatus =? WHERE bookingID =?"
             update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time,
                              driver_id, self.status, self.payment_status, self.booking_id)
             db.insert_data(query=update_query, data=update_params)
@@ -289,7 +289,7 @@ class BookingWidget(QWidget):
             self.drivers = self.get_all_drivers()
             self.driver_name_edit = QComboBox()
             driver_names = (driver[0] for driver in self.drivers)
-            self.driver_combobox.addItems(driver_names)
+            self.driver_name_edit.addItems(driver_names)
             index = self.driver_name_edit.findText(self.name)
 
             if index != -1:
