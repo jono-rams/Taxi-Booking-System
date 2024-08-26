@@ -23,7 +23,7 @@ class ApproveBookingWidget(QWidget):
             db.connect("db/test.db")
             update_query = "UPDATE booking SET DriverID = ?, status = 'Confirmed' WHERE bookingID = ?"
             update_params = (driver_id, self.booking_id)
-            db.execute_query(query=update_query, params=update_params)
+            db.insert_data(query=update_query, data=update_params)
             db.close_connection()
             QMessageBox.information(None, "Booking Updated", "Driver assigned successfully.")
             self.close()

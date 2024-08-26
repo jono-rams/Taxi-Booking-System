@@ -13,7 +13,7 @@ class BookingWidget(QWidget):
 
         db = Database()
         db.connect("db/test.db")
-        db.execute_query(query=cancel_query, params=cancel_params)
+        db.insert_data(query=cancel_query, data=cancel_params)
         db.close_connection()
 
     def decline_booking(self):
@@ -22,7 +22,7 @@ class BookingWidget(QWidget):
 
         db = Database()
         db.connect("db/test.db")
-        db.execute_query(query=decline_query, params=decline_params)
+        db.insert_data(query=decline_query, data=decline_params)
         db.close_connection()
 
     def approve_booking(self):
@@ -48,13 +48,13 @@ class BookingWidget(QWidget):
             update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
                        "pickupDate =?, pickupTime =?, WHERE bookingID =?"
             update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time)
-            db.execute_query(query=update_query, params=update_params)
+            db.insert_data(query=update_query, data=update_params)
         elif self.is_admin:
             update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
                        "pickupDate =?, pickupTime =?, DriverID =?, status =?, paymentStatus =? WHERE bookingID =?"
             update_params = (self.pickup_addr, self.destination, self.pickup_date, self.pickup_time,
                              driver_id, self.status, self.payment_status, self.booking_id)
-            db.execute_query(query=update_query, params=update_params)
+            db.insert_data(query=update_query, data=update_params)
 
         db.close_connection()
 
