@@ -48,7 +48,7 @@ class UpcomingBookings(QWidget):
 
             view_btn = QPushButton("View")
             view_btn.setFixedSize(120, 50)
-            view_btn.clicked.connect(lambda _, idx=i: self.handle_view_click(idx))
+            view_btn.clicked.connect(lambda _, idx=i: self.handle_view_click(idx))  # Connect button to function passing its index as a parameter
             entry_layout.addWidget(view_btn)
 
             scroll_layout.addLayout(entry_layout)

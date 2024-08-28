@@ -8,6 +8,12 @@ from connection import Database
 class ApproveBookingWidget(QWidget):
     @staticmethod
     def get_all_drivers(db_path):
+        """
+            Retrieves all the active drivers from the database.
+
+            :param db_path: Path to the SQLite database
+            :return: List of active drivers in the form of tuples (name, driverID) or an empty list if no drivers are found
+        """
         db = Database()
         db.connect(db_path)
         drivers_query = "SELECT name, driverID FROM driver WHERE status = 'Active'"
