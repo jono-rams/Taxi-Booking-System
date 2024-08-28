@@ -42,11 +42,13 @@ class HomeWidget(QWidget):
         palette.setBrush(QPalette.ColorGroup.All, QPalette.ColorRole.Window, QBrush(scaled_bg))
         self.setPalette(palette)
 
-    def __init__(self, app):
+    def __init__(self, app, db_path):
         super().__init__()
 
         self.login_dialog = None
         self.register_dialog = None
+
+        self.db_path = db_path
 
         # Create Main Window
         self.setWindowTitle("Taxi Booking System")

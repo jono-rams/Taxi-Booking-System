@@ -6,33 +6,105 @@ from connection import Database
 from approvebooking import ApproveBookingWidget
 
 
+def confirm_action(title="Confirmation", text="Are you sure you want to proceed?"):
+    """
+    Displays a confirmation dialog using QMessageBox
+
+    Args:
+        title: The title of the dialog window.
+        text: The text message to display in the dialog.
+
+    Returns:
+        True if the user clicks "Yes" or "OK," False otherwise.
+    """
+
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Icon.Question)
+    msg_box.setWindowTitle(title)
+    msg_box.setText(text)
+    msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+    msg_box.setDefaultButton(QMessageBox.StandardButton.No)  # Set "No" as the default
+
+    button_clicked = msg_box.exec()
+
+    if button_clicked == QMessageBox.StandardButton.Yes:
+        return True
+    else:
+        return False
+
+
 class BookingWidget(QWidget):
-    def cancel_booking(self):
-        cancel_query = "UPDATE booking SET BookingStatus = 'Cancelled' WHERE bookingID = ?"
-        cancel_params = (self.booking_id,)
+    """
+    This class is a widget that displays all the details of a given booking,
+    it also allows for the editing, cancellation, approval and rejection of the booking,
+    the functionality is controlled by three boolean arguments in the constructor,
+    only one of the booleans can be true in an instance of BookingWidget
+    """
+    @staticmethod
+    def one_or_none_true(a, b, c):
+        """Helper function that checks if at most one of the three booleans is True."""
 
+        return not ((a and not b and not c) or
+                    (not a and b and not c) or
+                    (not a and not b and c) or
+                    (not a and not b and not c))
+
+    @staticmethod
+    def get_all_drivers(db_path):
+        """
+        Retrieves all the active drivers from the database.
+
+        :param db_path: Path to the SQLite database
+        :return: List of active drivers in the form of tuples (name, driverID) or an empty list if no drivers are found
+        """
         db = Database()
-        db.connect("db/test.db")
-        db.insert_data(query=cancel_query, data=cancel_params)
+        db.connect(db_path)
+        drivers_query = "SELECT name, driverID FROM driver WHERE status = 'Active'"
+        drivers = db.execute_query(query=drivers_query, fetch_all=True)
         db.close_connection()
+        return drivers or []
 
-    def decline_booking(self):
-        decline_query = "UPDATE booking SET BookingStatus = 'Declined' WHERE bookingID = ?"
-        decline_params = (self.booking_id,)
+    @staticmethod
+    def get_driver_name(d_id, db_path):
+        """
+        Retrieves the name of the driver from the database given their driver ID.
 
+        :param d_id: ID of the driver
+        :param db_path: Path to the SQLite database
+        :return: Driver name or "Unknown" if the driver ID is not found
+        """
         db = Database()
-        db.connect("db/test.db")
-        db.insert_data(query=decline_query, data=decline_params)
+        db.connect(db_path)
+        name_query = "SELECT name FROM driver WHERE DriverID = ?"
+        name = db.execute_query(query=name_query, params=(d_id,), fetch_all=False)
         db.close_connection()
+        return name if name else "Unknown"
 
-    def approve_booking(self):
-        approve_widget = ApproveBookingWidget(self.booking_id)
-        approve_widget.show()
-        self.close()
+    @staticmethod
+    def get_customer_name(c_id, db_path):
+        """
+        Retrieves the name of the customer from the database given their customer ID.
+
+        :param c_id: Customer ID
+        :param db_path: Path to the SQLite database
+        :return: Customer name or "Unknown" if the customer ID is not found
+        """
+        db = Database()
+        db.connect(db_path)
+        name_query = "SELECT name FROM customer WHERE CustomerID = ?"
+        name = db.execute_query(query=name_query, params=(c_id,), fetch_all=False)
+        db.close_connection()
+        return name if name else "Unknown"
 
     def update_booking(self):
+        """
+        Updates the booking details in the database.
+        """
+        if not confirm_action(title="Update Booking", text="Are you sure you want to update the booking?"):
+            return
+
         db = Database()
-        db.connect("db/test.db")
+        db.connect(self.db_path)
 
         self.pickup_addr = self.pickup_addr_edit.text()
         self.destination = self.destination_edit.text()
@@ -43,7 +115,10 @@ class BookingWidget(QWidget):
             self.payment_status = self.payment_status_edit.text()
             idx = self.driver_name_edit.currentIndex()
             driver_id = self.drivers[idx][1]
+        else:
+            driver_id = -1
 
+        # Changes what fields are updated depending on if it is a customer or admin who edited the booking details
         if self.is_customer:
             update_query = "UPDATE booking SET pickupAddress =?, destinationAddress =?, " \
                        "pickupDate =?, pickupTime =? WHERE bookingID =?"
@@ -57,44 +132,57 @@ class BookingWidget(QWidget):
             db.insert_data(query=update_query, data=update_params)
 
         db.close_connection()
+        QMessageBox.information(self, "Update Successful", "The booking details have been successfully updated.")
+        self.view_booking()
 
-    @staticmethod
-    def one_or_none_true(a, b, c):
-        """Checks if at most one of the three booleans is True."""
+    def cancel_booking(self):
+        """
+        Cancels the booking in the database.
+        """
+        if not confirm_action(title="Cancel Booking", text="Are you sure you want to cancel this booking?"):
+            return
 
-        return not ((a and not b and not c) or
-            (not a and b and not c) or
-            (not a and not b and c) or
-            (not a and not b and not c))
+        cancel_query = "UPDATE booking SET BookingStatus = 'Cancelled' WHERE bookingID = ?"
+        cancel_params = (self.booking_id,)
 
-    @staticmethod
-    def get_customer_name(c_id):
         db = Database()
-        db.connect("db/test.db")
-        name_query = "SELECT name FROM customer WHERE CustomerID = ?"
-        name = db.execute_query(query=name_query, params=(c_id,), fetch_all=False)
+        db.connect(self.db_path)
+        db.insert_data(query=cancel_query, data=cancel_params)
         db.close_connection()
-        return name if name else "Unknown"
 
-    @staticmethod
-    def get_all_drivers():
-        db = Database()
-        db.connect("db/test.db")
-        drivers_query = "SELECT name, driverID FROM driver WHERE status = 'Active'"
-        drivers = db.execute_query(query=drivers_query)
-        db.close_connection()
-        return drivers or []
+        QMessageBox.information(self, "Booking Cancelled", "The booking has been successfully cancelled.")
+        self.close()
 
-    @staticmethod
-    def get_driver_name(d_id):
+    def decline_booking(self):
+        """
+        Sets the BookingStatus of the booking to declined in the database.
+        """
+        if not confirm_action(title="Decline Booking", text="Are you sure you want to decline this booking?"):
+            return
+
+        decline_query = "UPDATE booking SET BookingStatus = 'Declined' WHERE bookingID = ?"
+        decline_params = (self.booking_id,)
+
         db = Database()
-        db.connect("db/test.db")
-        name_query = "SELECT name FROM driver WHERE DriverID = ?"
-        name = db.execute_query(query=name_query, params=(d_id,), fetch_all=False)
+        db.connect(self.db_path)
+        db.insert_data(query=decline_query, data=decline_params)
         db.close_connection()
-        return name if name else "Unknown"
+
+        QMessageBox.information(self, "Booking Declined", "The booking has been successfully declined.")
+        self.close()
+
+    def approve_booking(self):
+        if not confirm_action(title="Approve Booking", text="Are you sure you want to approve this booking?"):
+            return
+
+        self.approve_widget = ApproveBookingWidget(self.booking_id, self.db_path)
+        self.approve_widget.show()
+        self.close()
 
     def edit_booking(self):
+        """
+        Makes the relevant fields editable
+        """
         self.pickup_addr_edit.setReadOnly(False)
         self.destination_edit.setReadOnly(False)
         self.pickup_date_edit.setReadOnly(False)
@@ -105,16 +193,24 @@ class BookingWidget(QWidget):
             self.payment_status_edit.setReadOnly(False)
 
         self.edit_btn.setText("View")
+        self.edit_btn.clicked.disconnect()
         self.edit_btn.clicked.connect(self.view_booking)
         self.third_btn.setText("Update")
+        self.third_btn.clicked.disconnect()
         self.third_btn.clicked.connect(self.update_booking)
         self.third_btn.show()
         self.third_btn.setEnabled(False)
 
     def on_edited(self):
+        """
+        Called when a booking detail field has been edited. Enables the update button.
+        """
         self.third_btn.setEnabled(True)
 
     def view_booking(self):
+        """
+        Disables editing any of the fields and also resets the values if it was not updated
+        """
         self.pickup_addr_edit.setReadOnly(True)
         self.pickup_addr_edit.setText(self.pickup_addr)
         self.destination_edit.setReadOnly(True)
@@ -136,22 +232,29 @@ class BookingWidget(QWidget):
             self.payment_status_edit.setText(self.payment_status)
 
         self.edit_btn.setText("Edit")
+        self.edit_btn.clicked.disconnect()
         self.edit_btn.clicked.connect(self.edit_booking)
         self.third_btn.setText("Cancel")
+        self.third_btn.clicked.disconnect()
         self.third_btn.clicked.connect(self.cancel_booking)
         self.third_btn.setEnabled(True)
         if self.is_admin:
             self.third_btn.hide()
 
-    def __init__(self, booking, is_customer=False, is_admin=False, is_to_approve=False):
+    def __init__(self, booking, db_path, is_customer=False, is_admin=False, is_to_approve=False):
         super().__init__()
         (self.booking_id, self.pickup_addr, self.destination, self.pickup_date, self.pickup_time, self.status, self.customer_id,
          self.driver_id, self.payment_status) = booking
 
+        # Assignment of arguments to local variables
         self.is_admin = is_admin
         self.is_customer = is_customer
         self.is_to_approve = is_to_approve
+        self.db_path = db_path
 
+        self.approve_widget = None
+
+        # Confirms at most one of the three boolean arguments is true
         if self.one_or_none_true(is_admin, is_customer, is_to_approve):
             raise ValueError("NONE or ONLY ONE of is_admin, is_customer, and is_to_approve should be True.")
 
@@ -178,6 +281,7 @@ class BookingWidget(QWidget):
         details_layout = QVBoxLayout()
         v_layout.addLayout(details_layout)
 
+        # Horizontal Layout for each field
         id_layout = QHBoxLayout()
         pickup_addr_layout = QHBoxLayout()
         destination_layout = QHBoxLayout()
@@ -279,14 +383,16 @@ class BookingWidget(QWidget):
         status_layout.addWidget(self.status_edit)
         self.status_edit.textEdited.connect(self.on_edited)
 
-        name = self.get_customer_name(self.customer_id)
+        name = self.get_customer_name(self.customer_id, self.db_path)
         self.customer_name_edit = QLineEdit(str(name[0]))
         self.customer_name_edit.setReadOnly(True)
         customer_name_layout.addWidget(self.customer_name_edit)
 
+        # Enables specific fields depending on who is viewing the booking details
         if is_admin:
-            self.name = self.get_driver_name(self.driver_id)
-            self.drivers = self.get_all_drivers()
+            t_name = self.get_driver_name(self.driver_id, db_path=self.db_path)
+            self.name = str(t_name[0])
+            self.drivers = self.get_all_drivers(db_path=self.db_path)
             self.driver_name_edit = QComboBox()
             driver_names = (driver[0] for driver in self.drivers)
             self.driver_name_edit.addItems(driver_names)
@@ -309,7 +415,7 @@ class BookingWidget(QWidget):
             if self.driver_id == -1:
                 name = "Unassigned"
             else:
-                name = self.get_driver_name(self.driver_id)
+                name = self.get_driver_name(self.driver_id, db_path=self.db_path)
 
             self.driver_name_edit = QLineEdit(str(name[0]))
             self.driver_name_edit.setReadOnly(True)
@@ -320,7 +426,7 @@ class BookingWidget(QWidget):
         buttons_layout = QHBoxLayout()
         v_layout.addLayout(buttons_layout)
 
-        # Edit Button
+        # Edit/Approve Button
         if is_customer or is_admin:
             self.edit_btn = QPushButton("Edit")
             self.edit_btn.clicked.connect(self.edit_booking)
@@ -332,6 +438,7 @@ class BookingWidget(QWidget):
         else:
             self.edit_btn = None
 
+        # Third button which has multiple functionalities (Cancel, Update, Decline)
         if is_customer:
             self.third_btn = QPushButton("Cancel")
             self.third_btn.clicked.connect(self.cancel_booking)
