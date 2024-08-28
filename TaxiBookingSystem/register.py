@@ -8,7 +8,7 @@ from connection import Database
 class RegisterWidget(QWidget):
 
     def handle_register(self):
-        self.db.connect("db/test.db")
+        self.db.connect(self.db_path)
         email: str = self.email_input.text()
         password: str = self.password_input.text()
 
@@ -41,6 +41,7 @@ class RegisterWidget(QWidget):
         super().__init__()
 
         self.db = Database()
+        self.db_path = home_widget.db_path
         self.home = home_widget
 
         # Create Main Window

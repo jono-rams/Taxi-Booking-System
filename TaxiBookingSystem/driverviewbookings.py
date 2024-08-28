@@ -14,12 +14,17 @@ class ViewBookings(QWidget):
         self.close()
         self.dash_reference.show()
 
-    def __init__(self, driver_id, dash_reference):
+    def __init__(self, driver_id, db_path, dash_reference=None, is_admin=False):
         super().__init__()
+
+        self.is_admin = is_admin
 
         self.driver_id = driver_id
         self.booking_widget = None
-        self.dash_reference = dash_reference
+        self.db_path = db_path
+        if dash_reference:
+            self.dash_reference = dash_reference
+            self.dash_reference.hide()
 
         self.setWindowTitle("All Bookings")
         self.setFixedSize(800, 450)
@@ -34,7 +39,7 @@ class ViewBookings(QWidget):
         self.layout.addWidget(scroll_area)
 
         self.db = Database()
-        self.db.connect("db/test.db")
+        self.db.connect(self.db_path)
         booking_query = "SELECT * FROM booking WHERE DriverID = ? AND PickupDate >= ? AND BookingStatus = 'Confirmed'"
         today = datetime.date.today()
         booking_params = (self.driver_id, today)
@@ -49,7 +54,7 @@ class ViewBookings(QWidget):
 
             view_btn = QPushButton("View")
             view_btn.setFixedSize(120, 50)
-            view_btn.clicked.connect(lambda _, idx=i: self.handle_view_click(idx))
+            view_btn.clicked.connect(lambda _, idx=i: self.handle_view_click(idx))  # Connect button to function passing its index as a parameter
             entry_layout.addWidget(view_btn)
 
             scroll_layout.addLayout(entry_layout)
@@ -68,5 +73,9 @@ class ViewBookings(QWidget):
 
     def handle_view_click(self, index):
         # Call view booking data with index to pull data from bookings
-        self.booking_widget = BookingWidget(booking=self.bookings[index])
-        self.booking_widget.show()
+        if self.is_admin:
+            self.booking_widget = BookingWidget(booking=self.bookings[index], db_path=self.db_path, is_admin=True)
+            self.booking_widget.show()
+        else:
+            self.booking_widget = BookingWidget(booking=self.bookings[index], db_path=self.db_path)
+            self.booking_widget.show()

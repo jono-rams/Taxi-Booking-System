@@ -8,14 +8,15 @@ from driverviewbookings import ViewBookings
 class DriverDashboard(QWidget):
 
     def handle_view(self):
-        self.vb = ViewBookings(driver_id=self.id, dash_reference=self)
+        self.vb = ViewBookings(driver_id=self.id, db_path=self.db_path, dash_reference=self)
         self.vb.show()
         self.hide()
 
-    def __init__(self, driver_id):
+    def __init__(self, driver_id, db_path):
         super().__init__()
 
         self.vb = None
+        self.db_path = db_path
 
         self.id = driver_id
         self.name = None
@@ -27,7 +28,7 @@ class DriverDashboard(QWidget):
         self.license_exp = None
 
         self.db = Database()
-        self.db.connect("db/test.db")
+        self.db.connect(db_path)
         driver_query = "SELECT * FROM driver WHERE driverID =?"
         driver = self.db.execute_query(query=driver_query, params=driver_id)
         if driver:
@@ -37,6 +38,7 @@ class DriverDashboard(QWidget):
         self.db.close_connection()
 
         self.setWindowTitle("Driver Dashboard")
+        self.setFixedSize(800, 600)
 
         v_layout = QVBoxLayout()
 
@@ -54,10 +56,12 @@ class DriverDashboard(QWidget):
 
         # Create Horizontal Layout for Buttons
         buttons_layout = QHBoxLayout()
+        buttons_layout.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter)
 
         # Create Login Button
         self.view_book_btn = QPushButton("View Bookings")
         self.view_book_btn.clicked.connect(self.handle_view)
+        self.view_book_btn.setFixedSize(200, 75)
 
         # Add Login Button to Button Layout
         buttons_layout.addWidget(self.view_book_btn)
@@ -65,6 +69,7 @@ class DriverDashboard(QWidget):
         # Create Close Button
         self.close_btn = QPushButton("Logout")
         self.close_btn.clicked.connect(self.close)
+        self.close_btn.setFixedSize(200, 75)
 
         # Add Close Button to Button Layout
         buttons_layout.addWidget(self.close_btn)

@@ -4,12 +4,14 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from connection import Database
 from driverdash import DriverDashboard
+from customerdash import CustomerWindow
+from admindash import AdminWindow
 
 
 class LoginWidget(QWidget):
 
     def handle_login(self):
-        self.db.connect("db/test.db")
+        self.db.connect(self.db_path)
         email: str = self.email_input.text()
         password: str = self.password_input.text()
 
@@ -28,11 +30,18 @@ class LoginWidget(QWidget):
         if self.selected_option == 0:
             login_query = "SELECT customerID FROM customer WHERE email =? AND password =?"
             result = self.db.execute_query(query=login_query, params=login_params)
+            if result:
+                self.dash = CustomerWindow(customer_id=result, db_path=self.db_path)
+                self.dash.show()
+                self.menu_ref.close()
+                self.close()
+            else:
+                QMessageBox.warning(None, "Error", "Invalid email or password.")
         elif self.selected_option == 1:
             login_query = "SELECT driverID FROM driver WHERE email =? AND password =? AND status = 'Active'"
             result = self.db.execute_query(query=login_query, params=login_params)
             if result:
-                self.dash = DriverDashboard(driver_id=result)
+                self.dash = DriverDashboard(driver_id=result, db_path=self.db_path)
                 self.dash.show()
                 self.menu_ref.close()
                 self.close()
@@ -41,6 +50,13 @@ class LoginWidget(QWidget):
         else:
             login_query = "SELECT AdminID FROM administrator WHERE email =? AND password = ?"
             result = self.db.execute_query(query=login_query, params=login_params)
+            if result:
+                self.dash = AdminWindow(admin_id=result, db_path=self.db_path)
+                self.dash.show()
+                self.menu_ref.close()
+                self.close()
+            else:
+                QMessageBox.warning(None, "Error", "Invalid email or password.")
 
         self.db.close_connection()
 
@@ -48,6 +64,7 @@ class LoginWidget(QWidget):
         super().__init__()
 
         self.db = Database()
+        self.db_path = menu_ref.db_path
 
         self.dash = None
         self.menu_ref = menu_ref
