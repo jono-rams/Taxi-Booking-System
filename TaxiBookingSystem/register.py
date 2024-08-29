@@ -8,13 +8,31 @@ from connection import Database
 class RegisterWidget(QWidget):
 
     def handle_register(self):
-        self.db.connect(self.db_path)
+        db = Database()
+        db.connect(self.db_path)
+
+        # Retrieve input values
+        name: str = self.name_input.text()
+        address: str = self.address_input.text()
         email: str = self.email_input.text()
+        phoneno: str = self.phone_input.text()
         password: str = self.password_input.text()
 
-        # Validate email and password being entered
+        # Validate inputs
+        if not name:
+            QMessageBox.warning(None, "Error", "Please enter your name.")
+            return
+
+        if not address:
+            QMessageBox.warning(None, "Error", "Please enter your address.")
+            return
+
         if not email:
             QMessageBox.warning(None, "Error", "Please enter an email address.")
+            return
+
+        if not phoneno:
+            QMessageBox.warning(None, "Error", "Please enter your phone number.")
             return
 
         if not password:
@@ -22,8 +40,8 @@ class RegisterWidget(QWidget):
             return
 
         # Create Insert statement
-        register_query = "INSERT INTO users (email, password) VALUES (?, ?)"
-        reg_data = (email, password)
+        register_query = "INSERT INTO customer (name, address, email, phoneno, password) VALUES (?, ?, ?, ?, ?)"
+        reg_data = (name, address, email, phoneno, password)
 
         results = self.db.insert_data(query=register_query, data=reg_data)  # Runs insert statement
 
@@ -37,16 +55,15 @@ class RegisterWidget(QWidget):
             self.home.open_login_dialog()
             self.close()
 
-    def __init__(self, home_widget):
+    def __init__(self, home_widget, db_path):
         super().__init__()
 
-        self.db = Database()
-        self.db_path = home_widget.db_path
+        self.db_path = db_path
         self.home = home_widget
 
         # Create Main Window
         self.setWindowTitle("Register")
-        self.setFixedSize(600, 450)
+        self.setFixedSize(600, 500)  # Increased size to accommodate new fields
 
         # Create Vertical Layout
         v_layout = QVBoxLayout()
@@ -63,35 +80,49 @@ class RegisterWidget(QWidget):
         # Add Label to Vertical Layout
         v_layout.addWidget(label)
 
-        # Create Horizontal Layout for Email
-        email_layout = QHBoxLayout()
-
-        # Create Email Textbox
-        email_label = QLabel("Email:")
-        self.email_input = QLineEdit()
-
-        # Add Email widgets to Layout
-        email_layout.addWidget(email_label)
-        email_layout.addWidget(self.email_input)
-
-        # Create Horizontal Layout for Password
-        password_layout = QHBoxLayout()
-
-        # Create Password Textbox
-        password_label = QLabel("Password:")
-        self.password_input = QLineEdit()
-        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-
-        # Add Password widgets to Layout
-        password_layout.addWidget(password_label)
-        password_layout.addWidget(self.password_input)
-
-        # Create Vertical Layout for Fields
+        # Create Layout for Input Fields
         fields_layout = QVBoxLayout()
         fields_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Add Email and Password Layouts to Fields Layout
+        # Create and add Name input field
+        name_layout = QHBoxLayout()
+        name_label = QLabel("Name:")
+        self.name_input = QLineEdit()
+        name_layout.addWidget(name_label)
+        name_layout.addWidget(self.name_input)
+        fields_layout.addLayout(name_layout)
+
+        # Create and add Address input field
+        address_layout = QHBoxLayout()
+        address_label = QLabel("Address:")
+        self.address_input = QLineEdit()
+        address_layout.addWidget(address_label)
+        address_layout.addWidget(self.address_input)
+        fields_layout.addLayout(address_layout)
+
+        # Create and add Email input field
+        email_layout = QHBoxLayout()
+        email_label = QLabel("Email:")
+        self.email_input = QLineEdit()
+        email_layout.addWidget(email_label)
+        email_layout.addWidget(self.email_input)
         fields_layout.addLayout(email_layout)
+
+        # Create and add Phone Number input field
+        phone_layout = QHBoxLayout()
+        phone_label = QLabel("Phone Number:")
+        self.phone_input = QLineEdit()
+        phone_layout.addWidget(phone_label)
+        phone_layout.addWidget(self.phone_input)
+        fields_layout.addLayout(phone_layout)
+
+        # Create and add Password input field
+        password_layout = QHBoxLayout()
+        password_label = QLabel("Password:")
+        self.password_input = QLineEdit()
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        password_layout.addWidget(password_label)
+        password_layout.addWidget(self.password_input)
         fields_layout.addLayout(password_layout)
 
         # Add Fields Layout to Vertical Layout
@@ -100,18 +131,14 @@ class RegisterWidget(QWidget):
         # Create Horizontal Layout for Buttons
         buttons_layout = QHBoxLayout()
 
-        # Create Login Button
+        # Create Register Button
         self.register_btn = QPushButton("Register")
         self.register_btn.clicked.connect(self.handle_register)
-
-        # Add Login Button to Button Layout
         buttons_layout.addWidget(self.register_btn)
 
         # Create Close Button
         self.close_btn = QPushButton("Close")
         self.close_btn.clicked.connect(self.close)
-
-        # Add Close Button to Button Layout
         buttons_layout.addWidget(self.close_btn)
 
         # Add Buttons to Vertical Layout
