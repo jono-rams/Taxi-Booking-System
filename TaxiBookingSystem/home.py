@@ -18,7 +18,7 @@ class HomeWidget(QWidget):
         self.login_dialog.show()
 
     def open_register_dialog(self):
-        self.register_dialog = RegisterWidget(home_widget=self)
+        self.register_dialog = RegisterWidget(home_widget=self, db_path=self.db_path)
         self.register_dialog.show()
 
     def calculate_new_size(self, proposed_size):
