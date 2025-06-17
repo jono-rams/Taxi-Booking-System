@@ -23,6 +23,15 @@
         "doc",
         "infra"
       ]
+    },
+    {
+      "login": "black-joker90",
+      "name": "black-joker90",
+      "avatar_url": "https://avatars.githubusercontent.com/u/172131900?v=4",
+      "profile": "https://github.com/black-joker90",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitType": "docs"
