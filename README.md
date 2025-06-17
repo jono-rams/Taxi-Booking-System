@@ -25,6 +25,7 @@ Intro to Software Development Assignment 2
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://jono-rams.work"><img src="https://avatars.githubusercontent.com/u/29872001?v=4?s=100" width="100px;" alt="Jonathan Rampersad"/><br /><sub><b>Jonathan Rampersad</b></sub></a><br /><a href="https://github.com/jono-rams/Taxi-Booking-System/commits?author=jono-rams" title="Code">💻</a> <a href="https://github.com/jono-rams/Taxi-Booking-System/commits?author=jono-rams" title="Documentation">📖</a> <a href="#infra-jono-rams" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/black-joker90"><img src="https://avatars.githubusercontent.com/u/172131900?v=4?s=100" width="100px;" alt="black-joker90"/><br /><sub><b>black-joker90</b></sub></a><br /><a href="https://github.com/jono-rams/Taxi-Booking-System/commits?author=black-joker90" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/shiv-071"><img src="https://avatars.githubusercontent.com/u/176503606?v=4?s=100" width="100px;" alt="shiv-071"/><br /><sub><b>shiv-071</b></sub></a><br /><a href="https://github.com/jono-rams/Taxi-Booking-System/commits?author=shiv-071" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>
